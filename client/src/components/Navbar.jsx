@@ -41,6 +41,58 @@ const Navbar = () => {
                     <img src={assets.search_icon} alt="search" className="w-4 h-4" />
                 </div>
 
+                <div className="flex items-center gap-6">
+
+                    <div
+                        onClick={() => navigate('/cart')}
+                        className="relative cursor-pointer">
+                        <img src={assets.nav_cart_icon} alt="cart" className="w-6 opacity-80" />
+                        <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
+                            {getCartCount()}
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={() => (open ? setOpen(false) : setOpen(true))}
+                        aria-label="Menu"
+                        className="lg:hidden"
+                    >
+                        {/* Menu Icon SVG */}
+                        <img src={assets.menu_icon} alt="menu" />
+                    </button>
+
+                </div>
+
+                {/* Mobile Menu */}
+                {open && (
+                    <div
+                        className={`${open ? "flex" : "hidden"} absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden`}
+                    >
+
+                        <NavLink to='/' onClick={() => setOpen(false)}>Home</NavLink>
+                        <NavLink to='/products' onClick={() => setOpen(false)}>All Products</NavLink>
+                        {user &&
+                            <NavLink to='/products' onClick={() => setOpen(false)}>My Orders</NavLink>
+                        }
+
+                        <NavLink to='/' onClick={() => setOpen(false)}>Contact</NavLink>
+                        {!user ? (
+                            <button
+                                onClick={() => {
+                                    setOpen(false);
+                                    setShowUserLogin(false)
+                                }}
+                                className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-primary transition text-white rounded-full text-sm">
+                                Login
+                            </button>
+                        ) : (<button
+                            onClick={logout}
+                            className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-primary transition text-white rounded-full text-sm">
+                            Logout
+                        </button>)}
+
+                    </div>)}
+
                 {!user ? (
                     <button
                         onClick={() => setShowUserLogin(true)}
@@ -57,57 +109,7 @@ const Navbar = () => {
                     </div>
                 )}
             </div>
-            <div className="flex items-center gap-6 sm:hidden">
 
-                <div
-                    onClick={() => navigate('/cart')}
-                    className="relative cursor-pointer">
-                    <img src={assets.nav_cart_icon} alt="cart" className="w-6 opacity-80" />
-                    <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
-                        {getCartCount()}
-                    </button>
-                </div>
-
-                <button
-                    onClick={() => (open ? setOpen(false) : setOpen(true))}
-                    aria-label="Menu"
-                    className=""
-                >
-                    {/* Menu Icon SVG */}
-                    <img src={assets.menu_icon} alt="menu" />
-                </button>
-
-            </div>
-
-            {/* Mobile Menu */}
-            {open && (
-                <div
-                    className={`${open ? "flex" : "hidden"} absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden`}
-                >
-
-                    <NavLink to='/' onClick={() => setOpen(false)}>Home</NavLink>
-                    <NavLink to='/products' onClick={() => setOpen(false)}>All Products</NavLink>
-                    {user &&
-                        <NavLink to='/products' onClick={() => setOpen(false)}>My Orders</NavLink>
-                    }
-
-                    <NavLink to='/' onClick={() => setOpen(false)}>Contact</NavLink>
-                    {!user ? (
-                        <button
-                            onClick={() => {
-                                setOpen(false);
-                                setShowUserLogin(false)
-                            }}
-                            className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-primary transition text-white rounded-full text-sm">
-                            Login
-                        </button>
-                    ) : (<button
-                        onClick={logout}
-                        className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-primary transition text-white rounded-full text-sm">
-                        Logout
-                    </button>)}
-
-                </div>)}
         </nav >
     );
 };
