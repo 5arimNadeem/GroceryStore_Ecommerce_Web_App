@@ -16,7 +16,6 @@ const addProduct = async (req, res) => {
                 )
                 return result.secure_url
 
-                TrackEvent
             })
         )
         await Product.create({ ...productData, image: imagesUrl })
@@ -43,8 +42,8 @@ const productList = async (req, res) => {
 
 const productById = async (req, res) => {
     try {
-        const id = req.user.id
-        const products = await Product.findById(id)
+        const { id } = req.params
+        const product = await Product.findById(id)
         res.json({ success: true, product })
     } catch (error) {
         console.log(error.message)
@@ -56,8 +55,7 @@ const productById = async (req, res) => {
 
 const changeStock = async (req, res) => {
     try {
-        const id = req.user.id
-        const isStock = req.user.inStock
+        const { id, inStock } = req.body
 
         await Product.findByIdAndUpdate(id, { inStock })
         res.json({ succes: true, message: "Stock updated" })

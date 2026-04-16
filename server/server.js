@@ -10,12 +10,15 @@ import productRouter from "./routes/productRoute.js"
 import cartRouter from "./routes/cartRoute.js"
 import addressRouter from "./routes/addressRoute.js"
 import orderRouter from "./routes/orderRoute.js"
+import { stripeWebHooks } from './controllers/orderController.js'
 
 const app = express()
 const port = process.env.PORT || 4000
 
 await connectDB()
 await connectCloudinary()
+
+app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebHooks)
 
 const allowedOrigins = ['http://localhost:5173']
 // middleware config's
@@ -26,7 +29,9 @@ app.use(express.json())
 app.use(cookieParser())
 
 
-app.get('/', (req, res) => res.send("Api is working"))
+app.get('/', (req, res) => {
+    res.json({ success: true, message: "we are back in the game" })
+})
 app.use('/api/user', userRouter)
 app.use('/api/seller', sellerRouter)
 app.use('/api/product', productRouter)

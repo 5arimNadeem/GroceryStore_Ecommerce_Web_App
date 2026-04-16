@@ -3,20 +3,65 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { assets, dummyProducts } from "../assets/assets.js"
 import toast from "react-hot-toast"
+import axios from "axios"
+
+axios.defaults.withCredentials = true
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
     const navigate = useNavigate()
     const currency = import.meta.env.VITE_CURRENCY
-    const [user, setUser] = useState(true)
+    const [user, setUser] = useState(null)
+    const [isSeller, setIsSeller] = useState(false)
+    const [showUserLogin, setShowUserLogin] = useState(false)
+    const [searchQuery, setSearchQuery] = useState({})
     const [cartItems, setCartItems] = useState({})
     const [products, setProducts] = useState([])
-    const [isSeller, setIsSeller] = useState(false)
-    const [searchQuery, setSearchQuery] = useState({})
-    const [showUserLogin, setShowUserLogin] = useState(false)
 
+
+
+    // Fetch Seller Status 
+
+    const fetchSeller = async () => {
+        try {
+            const { data } = await axios.get('/api/seller/is-auth')
+            if (data.success) {
+                setIsSeller(true)
+            } else {
+                setIsSeller(false)
+            }
+        } catch (error) {
+            setIsSeller(false)
+        }
+    }
+    // fetch user auth 
+
+    const fetchUser = async () => {
+        try {
+            const { data } = await axios.get('api/user/is-auth')
+            if (data.success) {
+                setUser(data.user)
+                setCartItems(data.user.cartItems)
+            }
+        } catch (error) {
+            setUser(null)
+        }
+    }
+
+    // fetch all products
     const fetchProducts = async () => {
-        setProducts(dummyProducts)
+        try {
+            const { data } = await axios.get('/api/product/list')
+            if (data.success) {
+                setProducts(data.products)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+
     }
 
     // The structuredClone() method of the Window interface creates a deep clone of a value using the structured clone algorithm. The method also allows transferable objects in the original value to be transferred rather than cloned to the new object.
@@ -37,7 +82,7 @@ export const AppContextProvider = ({ children }) => {
     const updateCartItem = (itemId, quantity) => {
         let cartData = structuredClone(cartItems)
 
-        cartData[itemId]
+        cartData[itemId] = quantity
         setCartItems(cartData)
         toast.success("Cart updated")
     }
@@ -55,6 +100,8 @@ export const AppContextProvider = ({ children }) => {
     }
     useEffect(() => {
 
+        fetchUser()
+        fetchSeller()
         fetchProducts()
     }, []);
 
@@ -81,10 +128,29 @@ export const AppContextProvider = ({ children }) => {
             }
         }
 
-        return Math.floor(totalAmount * 100) / 100 
+        return Math.floor(totalAmount * 100) / 100
     }
 
-    const value = { navigate, user, setUser, isSeller, assets, showUserLogin, setIsSeller, setShowUserLogin, products, addToCart, updateCartItem, removeFromCart, cartItems, currency, searchQuery, setSearchQuery, getCartAmount, getCartCount };
+    // update database cart itmes 
+
+    useEffect(() => {
+        const updateCart = async () => {
+            try {
+                const { data } = await axios.post('/api/cart/update', { cartItems })
+                if (!data.success) {
+                    toast.error(data.message)
+                }
+            } catch (error) {
+                toast.error(error.message)
+            }
+        }
+
+        if (user) {
+            updateCart()
+        }
+    }, [cartItems]);
+
+    const value = { navigate, user, setUser, isSeller, assets, showUserLogin, setIsSeller, setShowUserLogin, products, addToCart, updateCartItem, removeFromCart, cartItems, currency, searchQuery, setSearchQuery, getCartAmount, getCartCount, axios, fetchProducts, showUserLogin, setCartItems };
 
 
 

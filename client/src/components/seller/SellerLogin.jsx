@@ -2,28 +2,38 @@
 import { useEffect, useState } from "react";
 // import { assets } from "../assets/assets.js";
 // import axios from "axios";
-// import { toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext.jsx";
 
 const Login = () => {
-    const {isSeller, setIsSeller, navigate} = useAppContext() 
-    // const [state, setState] = useState("Admin");
-    const [email, setEmail] = useState('sam@g.com')
-    const [password, setPassword] = useState('1234')
-    // const { setAToken, backendUrl } = useContext(AdminContext)
-
-
-
-    useEffect(()=>{
-        if(isSeller) {
-            navigate('/seller')
-        }
-    },[isSeller])
+    const { isSeller, setIsSeller, navigate, axios } = useAppContext()
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
     const onSubmitHandler = async (e) => {
-        e.preventDefault()
-        setIsSeller(true)
+        try {
+            e.preventDefault();
+            const { data } = await axios.post('/api/seller/login', { email, password })
+            if (data.success) {
+                setIsSeller(true)
+                navigate('/seller')
+            }
+            else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+
     }
+
+
+
+    useEffect(() => {
+        if (isSeller) {
+            navigate('/seller')
+        }
+    }, [isSeller])
 
     return !isSeller && (
         <form

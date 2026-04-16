@@ -17,6 +17,7 @@ import SellerLayout from './pages/seller/SellerLayout.jsx'
 import AddProduct from './pages/seller/AddProduct.jsx'
 import Orders from './pages/seller/Orders.jsx'
 import ProductList from './pages/seller/ProductList.jsx'
+import Loading from './components/Loading.jsx'
 
 const App = () => {
   /* The useLocation hook in React Router is a function that returns the location object from the current URL. This location object contains the current URL's pathname, search parameters, hash fragment, and some other information. */
@@ -41,6 +42,8 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/add-address" element={<AddAddress />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/loader" element={<Loading />} />
+
           <Route path="/seller" element={isSeller ? <SellerLayout /> : <SellerLogin />} >
             <Route index element={isSeller ? <AddProduct /> : null} />
             <Route path='/seller/product-list' element={<ProductList />} />
